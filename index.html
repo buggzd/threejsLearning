@@ -1,0 +1,26 @@
+﻿<!DOCTYPE html>
+<html>
+	<head>
+
+		<meta charset="utf-8">
+		<!-- 在head配置下载的three.js位置,addons是引用插件 -->
+		<script type="importmap">
+			{
+				"imports":{
+					"three":"./three.js-dev/build/three.module.js",
+					"three/addons/": "./three.js-dev/examples/jsm/"
+				}
+			}
+		</script>
+		
+		<title>My first three.js app</title>
+		<style>
+			body { margin: 0; }
+		</style>
+	</head>
+	<body>
+		<!-- 底部引用时需要标明为模块 -->
+		<script type="module" src="./test01.js">
+		</script>
+	</body>
+</html>
