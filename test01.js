@@ -2,6 +2,10 @@
 // 使用OBJ模型导入插件
 import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js'
+// 后处理
+import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+import { SMAAPass } from 'three/addons/postprocessing/SMAAPass.js';
 const _floatStrength=0.01;
 
 console.log("import 完成");
@@ -10,7 +14,7 @@ const scene=new THREE.Scene();
 // 新建一个透视相机
 const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
 camera.position.set(0,0,5);
-
+camera.focus = true;
 const renderer = new THREE.WebGLRenderer();
 renderer.setSize( window.innerWidth, window.innerHeight );
 document.body.appendChild( renderer.domElement );
@@ -24,10 +28,11 @@ scene.add(dirLight);
 
 // 新建一个圆环缓冲扭结几何体
 const geometry = new THREE.TorusKnotGeometry( 1, 0.4, 1000, 64 );
-// 贴图
+// 贴图加载器
 const textureLoader = new THREE.TextureLoader( );
+// 加载一张贴图
 const texture = textureLoader.load( './textures/MatCap/resin.png' );
-
+// 新建一个MatCap的材质
 const material=new THREE.MeshMatcapMaterial({
 	color:0xffffff,
 	matcap: texture,
@@ -39,16 +44,36 @@ mesh.position.set(0,0.5,0);
 
 scene.add(mesh);
 
+//cubemap
+const path = './textures/SkyBox/indoor/';
+const format = '.png';
+const urls = [
+	path + 'px' + format, path + 'nx' + format,
+	path + 'py' + format, path + 'ny' + format,
+	path + 'pz' + format, path + 'nz' + format
+];
+// 创建一个反射cube
+const reflectionCube = new THREE.CubeTextureLoader().load( urls );
+scene.background = reflectionCube;
+
 const time=new THREE.Clock();
 
 const controls = new OrbitControls( camera, renderer.domElement );
+
+const composer = new EffectComposer( renderer );
+// 添加基础pass
+const renderPass = new RenderPass( scene, camera );
+composer.addPass( renderPass );
+// 添加抗锯齿
+const  smaaPass = new SMAAPass();
+composer.addPass( smaaPass );
 
 function animate() {
 	requestAnimationFrame( animate );
 	
 	objMoving(mesh);
 	camera.lookAt(mesh.position);
-	renderer.render( scene, camera );
+	composer.render();
 }
 
 function objMoving(obj){
