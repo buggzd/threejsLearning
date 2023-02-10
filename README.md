@@ -1,5 +1,7 @@
 # threejsLearning
  threejs学习
+ 
+ THREEJS版本：149
 # 笔记
 <a href="https://github.com/buggzd/threejsLearning/blob/main/notes/00参考资料.md">00参考资料</a>
 
