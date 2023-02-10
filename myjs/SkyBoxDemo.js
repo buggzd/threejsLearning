@@ -10,7 +10,7 @@ const scene=new THREE.Scene();
 // 初始化相机
 const camera=new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
 // 初始化渲染器
-const renderer=new THREE.WebGLRenderer();
+const renderer=new THREE.WebGLRenderer({antialias:true});
 // 初始化控制器
 const controls = new OrbitControls( camera, renderer.domElement );
 // 初始化物体
@@ -34,23 +34,28 @@ const reflectionCube = new THREE.CubeTextureLoader().load( urls );
 // 把这个天空盒设置为背景
 scene.background = reflectionCube;
 
-// 方法二：创建一个球体，把球体内外反转，在球体上直接贴一张全景图
-// 球的半径可以是相机的远平面距离
-const sphere=new THREE.SphereGeometry(1000, 60, 40);
-sphere.position=camera.position;
-sphere.scale(-1,1,1);
+
+// 方法二：直接读取hdr贴图，修改贴图格式为 等距圆柱投影的环境贴图，也被叫做经纬线映射贴图
 // 加载HDR贴图
 const rgbeLoader = new RGBELoader();
-const HDRtexture =rgbeLoader.load( './textures/SkyBox/indoor/SkyCube.hdr' );
-// 新建一个HDR的材质
-const HDRmaterial=new THREE.MeshBasicMaterial({
-	map: HDRtexture
+// 异步加载，不用异步会出错
+rgbeLoader.loadAsync("./textures/SkyBox/indoor/SkyCube.hdr").then((HDRtexture) => {
+    // 等距圆柱投影的环境贴图，也被叫做经纬线映射贴图
+    HDRtexture.mapping = THREE.EquirectangularReflectionMapping
+    // 设置背景图
+    scene.background = HDRtexture
+    // 设置默认环境
+    scene.environment = HDRtexture
 });
-const sphereMesh=new THREE.Mesh(sphere,HDRmaterial);
-sphereMesh.position.set(0,0,0);
-scene.add(sphereMesh);
-// 因为使用了hdr直接渲染会出现过暴，需要使用Gamma校正
-renderer.outputEncoding=THREE.sRGBEncoding;
+// 因为使用了hdr在不支持hdr的显示器上需要使用toneMapping
+// 色调映射属性.toneMapping用于在普通计算机显示器或者移动设备屏幕等低动态范围介质上，模拟、逼近高动态范围(HDR)效果
+renderer.toneMapping = THREE.ACESFilmicToneMapping
+// 色调映射的曝光级别。默认是1,曝光度值越大，图像亮度越高
+// 可以尝试不同值去测试显示效果 比如0:看不到  0.1:很暗  200:过于亮，轮廓感不清楚
+renderer.toneMappingExposure = 2;
+//是否乘以gamma输出，默认值false
+renderer.gammaOutput = false;
+
 
 
 
