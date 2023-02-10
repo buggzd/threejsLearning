@@ -1,4 +1,9 @@
-﻿import * as THREE from 'three';
+﻿
+/*
+		这是一个测试场景，展示了一个圆环缓冲扭结几何体，尝试了MatCap，天空盒，OrbitControls控制器，后处理。
+*/
+
+import * as THREE from 'three';
 // 使用OBJ模型导入插件
 import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js'
