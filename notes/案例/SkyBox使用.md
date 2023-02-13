@@ -5,6 +5,8 @@
 # 六面体天空盒
 案例中的写法是这样的，需要准备6张单独的贴图。
 
+px：x轴正向，nx：x轴负向 以此类推。
+
 如果想用全景贴图转换六面体贴图可以使用这个网站：<https://matheowis.github.io/HDRI-to-CubeMap/>
 
 ```js
