@@ -87,5 +87,17 @@ function initLight(){
     spotLight.shadow.mapSize= new THREE.Vector2(1024,1024);
     spotLight.shadow.camera.far=130;
     spotLight.shadow.camera.near=40;
+    // const helper = new THREE.CameraHelper( spotLight.shadow.camera );
+    // scene.add( helper );
+
+    var directionalLight=new THREE.DirectionalLight(0xFFFFFF);
+    directionalLight.position.set(0,10,10);
+    directionalLight.castShadow=true;
+    directionalLight.shadow.mapSize=new THREE.Vector2(1024,1024);
+    directionalLight.shadow.camera.far=130;
+    directionalLight.shadow.camera.near=40;
+    const helper2 = new THREE.CameraHelper( directionalLight.shadow.camera );
+    scene.add( helper2 );
+    scene.add(directionalLight);
     scene.add(spotLight);
 }
