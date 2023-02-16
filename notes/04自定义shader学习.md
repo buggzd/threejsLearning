@@ -73,12 +73,14 @@ console.log(cube);
 ### uniforms变量
 这个是对于vertexShader和fragmentShader的全局变量，但是需要手动定义。
 
-// TODO: 在哪里看这些赋值的uniform变量？
-
 threejs也提供一些内置的uniform变量。
 
 - modelViewMatrix：用于将顶点从模型空间转换到摄像机空间。
 - projectionMatrix：用于将摄像机空间的顶点转换为裁剪空间中的坐标。
+
+具体内置的变量在官方文档： https://threejs.org/docs/index.html#api/zh/renderers/webgl/WebGLProgram
+
+
 
 ## 使用GUI调参
 对于一些shader参数我们希望在运行的时候动态修改，所以需要使用GUI动态修改。

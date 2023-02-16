@@ -24,9 +24,13 @@ import fragmentShader from '../myshader/test01/fragmentShader.js';
 let object;
 // 初始化GUI控制器
 const indexControl = new function() {
+    // object属性
     this.speed = 0.01;
     this.moveRange = 0.1;
+    // shader属性
     this.color = 0xffffff;
+    // 场景属性
+    this.ambientLightColor = 0xffffff;
 
 }
 // 初始化GUI
@@ -39,6 +43,12 @@ const camera=new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHe
 const renderer=new THREE.WebGLRenderer({antialias:true});
 // 初始化effectComposer
 const composer = new EffectComposer( renderer );
+// 光照
+var ambientLight;
+var directionalLight;
+
+var dirLightColor ;
+var dirLightDirection = new THREE.Vector3();
 
 setRenderPass();
 // 初始化控制器
@@ -47,7 +57,7 @@ const controls = new OrbitControls( camera, renderer.domElement );
 const manager = new THREE.LoadingManager( loadModel );
 // 初始化OBJLoader
 const objLoader = new OBJLoader(manager);
-const modelsIsLoaded = false;
+var modelsIsLoaded = false;
 
 const time=new THREE.Clock();
 
@@ -62,12 +72,12 @@ function init(){
     initCamera();
     initRenderer();
     loadSkyBox();
+    initLight()
     initGUI();
 }
 
 function modelUpdate(){
     if(modelsIsLoaded){
-        
         upSpeed += indexControl.speed;
         object.position.y = indexControl.moveRange*Math.sin(upSpeed);
     }
@@ -84,12 +94,17 @@ function loadModel() {
             {
                 uniforms: THREE.UniformsUtils.merge([
                     THREE.UniformsLib.common,
+                    THREE.UniformsLib.lights,
                     {
                         color: { value: new THREE.Color(0xff0000) },
+                        diffuse: { value: 0.5 },
+                        specular: { value: 0.5 },
+                        glossiness: { value: 30 },
                     }
                 ]),
                 vertexShader: vertexShader,
                 fragmentShader: fragmentShader,
+                lights: true,
             }
         );
             console.log(child);
@@ -102,6 +117,9 @@ function loadModel() {
 }
 
 function loadModels(){
+    const cube=new THREE.Mesh(new THREE.BoxGeometry(1,1,1),new THREE.MeshPhongMaterial({color:0xffffff}));
+    cube.position.y=-1;
+    scene.add(cube);
 
     console.log(THREE.UniformsLib);
     var remainingModelsCount=1;
@@ -111,8 +129,10 @@ function loadModels(){
         './models/bunny.obj',
         // called when resource is loaded
         function ( obj ) {
+            console.log('loaded successfully')
             object=obj;
             modelsIsLoaded = true;
+            console.log(modelsIsLoaded);
         },
         // called when loading is in progresses
         function ( xhr ) {
@@ -147,6 +167,12 @@ function initGUI(){
             if ( child.isMesh ) child.material.uniforms.color.value=new THREE.Color(indexControl.color);
         } );
     });
+
+    const sceneControllerFloder = gui.addFolder('SceneController');
+    sceneControllerFloder.addColor(indexControl, 'ambientLightColor').onChange(function(value){
+        indexControl.ambientLightColor = value;
+        ambientLight.color = new THREE.Color(indexControl.ambientLightColor);
+    });
 }
 
 // 初始化渲染器
@@ -176,12 +202,7 @@ const urls = [
 const reflectionCube = new THREE.CubeTextureLoader().load( urls );
 // 把这个天空盒设置为背景
 scene.background = reflectionCube;
-// 添加天光
-const dirLight=new THREE.DirectionalLight(0xffffff,1);
-dirLight.position.set(1,1,1);
-scene.add(dirLight);
 }
-
 
 function setRenderPass(){
     // 初始化渲染pass
@@ -191,5 +212,20 @@ function setRenderPass(){
     //const filmPass = new FilmPass( 0.35, 0.025, 648, false );
     // filmPass.renderToScreen = true;
     // composer.addPass( filmPass );
+}
+
+function initLight(){
+// 添加天光
+directionalLight=new THREE.DirectionalLight(0xffffff,1);
+directionalLight.position.set(1,1,1);
+scene.add(directionalLight);
+ambientLight = new THREE.AmbientLight( 0xff00ff, 0.5 );
+scene.add( ambientLight );
+
+
+dirLightColor = directionalLight.color;
+ 
+directionalLight.getWorldDirection(dirLightDirection);
+
 }
 
