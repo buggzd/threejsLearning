@@ -92,14 +92,19 @@ function loadModel() {
         if ( child.isMesh ) {
             child.material=new THREE.RawShaderMaterial(
             {
+                // 设置uniforms变量，因为需要引用光照uniforms，所以需要使用merge合并
                 uniforms: THREE.UniformsUtils.merge([
-                    THREE.UniformsLib.common,
+                   
+                    // 引用光照uniforms
                     THREE.UniformsLib.lights,
                     {
+                        // 自定义uniforms
+                        // 基础颜色
                         color: { value: new THREE.Color(0xff0000) },
+                        
                         diffuse: { value: 0.5 },
                         specular: { value: 0.5 },
-                        glossiness: { value: 30 },
+                        glossiness: { value: 100 },
                     }
                 ]),
                 vertexShader: vertexShader,
@@ -132,7 +137,6 @@ function loadModels(){
             console.log('loaded successfully')
             object=obj;
             modelsIsLoaded = true;
-            console.log(modelsIsLoaded);
         },
         // called when loading is in progresses
         function ( xhr ) {
@@ -209,7 +213,7 @@ function setRenderPass(){
     const renderPass = new RenderPass( scene, camera );
     composer.addPass( renderPass );
     // 初始化filmPass
-    //const filmPass = new FilmPass( 0.35, 0.025, 648, false );
+    // const filmPass = new FilmPass( 0.35, 0.025, 648, false );
     // filmPass.renderToScreen = true;
     // composer.addPass( filmPass );
 }

@@ -108,3 +108,4 @@ modelControllerFloder.addColor(indexControl, 'color').onChange(function(value){
 # 参考
 Three.js着色器——矩阵变换： < http://www.yanhuangxueyuan.com/Three.js_course/advanced/shader2.html >
 
+自定义shader：< https://csantosbh.wordpress.com/2014/01/09/custom-shaders-with-three-js-uniforms-textures-and-lighting/ >
