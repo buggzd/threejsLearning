@@ -8,11 +8,19 @@ import { GUI } from "three/addons/libs/lil-gui.module.min.js";
 // shader
 import { RenderPass } from "three/addons/postprocessing/RenderPass.js";
 import { EffectComposer } from "three/addons/postprocessing/EffectComposer.js";
+import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
+import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+
 
 import {HolographyMaterial} from './shaderTest/Holography.js';
 
 let object;
-let noiseTexture;
+
+const ENTIRE_SCENE = 0, BLOOM_SCENE = 1;
+
+const bloomLayer = new THREE.Layers();
+bloomLayer.set( BLOOM_SCENE );
+
 // 初始化GUI控制器
 const indexControl = new function() {
     // object属性
@@ -52,6 +60,7 @@ const renderer=new THREE.WebGLRenderer({
     gammaFactor: 2.2, // 设置伽马因子为2.2（sRGB标准）
     outputEncoding: THREE.LinearEncoding // 输出颜色空间为sRGB
 });
+
 // 初始化effectComposer
 const composer = new EffectComposer( renderer );
 // 光照
@@ -299,6 +308,13 @@ function setRenderPass(){
     // 初始化渲染pass
     const renderPass = new RenderPass( scene, camera );
     composer.addPass( renderPass );
+
+    // TODO: 修复bloomPass 糊屏问题
+    // TODO: 添加SelectiveBloomPass
+    
+    // 初始化后期处理pass
+    const bloomPass = new UnrealBloomPass( new THREE.Vector2( window.innerWidth, window.innerHeight ), 1.5, 0.4, 0.85 );
+    // composer.addPass( bloomPass );
 }
 
 function initLight(){
