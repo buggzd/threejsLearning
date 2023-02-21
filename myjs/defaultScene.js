@@ -8,11 +8,11 @@ import { GUI } from "three/addons/libs/lil-gui.module.min.js";
 // shader
 import { RenderPass } from "three/addons/postprocessing/RenderPass.js";
 import { EffectComposer } from "three/addons/postprocessing/EffectComposer.js";
-import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 
 
-import {HolographyMaterial} from './shaderTest/Holography.js';
+import HolographyMaterial from './shaderTest/HolographyMaterial.js';
+import HolographyGUI from './shaderTest/HolographyGUI.js';
 
 let object;
 
@@ -21,27 +21,14 @@ const ENTIRE_SCENE = 0, BLOOM_SCENE = 1;
 const bloomLayer = new THREE.Layers();
 bloomLayer.set( BLOOM_SCENE );
 
+const holographyMaterial = new HolographyMaterial();
+
 // 初始化GUI控制器
 const indexControl = new function() {
     // object属性
     this.speed = 0.01;
     this.moveRange = 0.1;
-    // shader属性
-    this.color = 0xffffff;
-    this.enableFresnel = true;
-    this.fresnelPower = 2.0;
-    this.fresnelRange = 1;
-    this.fresnelColor = 0x0000ff;
-
-    this.enableWave = true;
-    this.WavePower = 2.0;
-    this.WaveRange = 1;
-    this.WaveColor = 0x00ff00;
-    this.WaveSpeed = 1.0;
-
-    this.Opacity = 1.0;
-
-
+  
     // 场景属性
     this.ambientLightColor = 0xffffff;
     this.directionalLightColor = 0xffffff;
@@ -50,15 +37,17 @@ const indexControl = new function() {
 }
 // 初始化GUI
 const gui = new GUI();
+// 初始化shaderGUI
+const shaderGUI = new HolographyGUI(holographyMaterial);
+
 // 初始化场景
 const scene=new THREE.Scene();
 // 初始化相机
 const camera=new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
 // 初始化渲染器
 const renderer=new THREE.WebGLRenderer({
-    antialias:true, 
     gammaFactor: 2.2, // 设置伽马因子为2.2（sRGB标准）
-    outputEncoding: THREE.LinearEncoding // 输出颜色空间为sRGB
+    outputEncoding: THREE.LinearEncoding ,// 输出颜色空间为sRGB
 });
 
 // 初始化effectComposer
@@ -114,16 +103,13 @@ function loadModel() {
     object.traverse( function ( child ) {
 
         if ( child.isMesh ) {
-            child.material =  HolographyMaterial;
+            child.material =  holographyMaterial.material;
             console.log(child);
         }
     } );
 
     object.position.x = 0;
     scene.add( object );
-
-   
-
 }
 
 function loadModels(){
@@ -168,82 +154,6 @@ function initGUI(){
 
     modelControllerFloder.add(indexControl, 'speed', 0, 0.1);
     modelControllerFloder.add(indexControl, 'moveRange', 0, 1);
-    modelControllerFloder.addColor(indexControl, 'color').onChange(function(value){
-        indexControl.color = value;
-        object.traverse( function ( child ) {
-            if ( child.isMesh ) child.material.uniforms.BaseColor.value=new THREE.Color(indexControl.color);
-        } );
-    });
-
-    modelControllerFloder.add(indexControl, 'enableFresnel').onChange(function(value){
-        indexControl.enableFresnel = value;
-        object.traverse( function ( child ) {
-            if ( child.isMesh ) child.material.uniforms.enableFresnel.value=indexControl.enableFresnel;
-        } );
-    });
-
-    modelControllerFloder.add(indexControl, 'fresnelPower', 0, 10).onChange(function(value){
-        indexControl.fresnelPower = value;
-        object.traverse( function ( child ) {
-            if ( child.isMesh ) child.material.uniforms.FresnelPower.value=indexControl.fresnelPower;
-        } );
-    });
-
-    modelControllerFloder.add(indexControl, 'fresnelRange', 0, 1).onChange(function(value){
-        indexControl.fresnelRange = value;
-        object.traverse( function ( child ) {
-            if ( child.isMesh ) child.material.uniforms.FresnelRange.value=indexControl.fresnelRange;
-        } );
-    });
-
-    modelControllerFloder.addColor(indexControl, 'fresnelColor').onChange(function(value){
-        indexControl.fresnelColor = value;
-        object.traverse( function ( child ) {
-            if ( child.isMesh ) child.material.uniforms.FresnelColor.value=new THREE.Color(indexControl.fresnelColor);
-        } );
-    });
-
-    modelControllerFloder.add(indexControl, 'enableWave').onChange(function(value){
-        indexControl.enablewave = value;
-        object.traverse( function ( child ) {
-            if ( child.isMesh ) child.material.uniforms.EnableWave.value=indexControl.enablewave;
-        } );
-    });
-
-    modelControllerFloder.add(indexControl, 'WavePower', 0, 10).onChange(function(value){
-        indexControl.wavePower = value;
-        object.traverse( function ( child ) {
-            if ( child.isMesh ) child.material.uniforms.WavePower.value=indexControl.wavePower;
-        } );
-    });
-
-    modelControllerFloder.add(indexControl, 'WaveRange', 0, 1).onChange(function(value){
-        indexControl.waveRange = value;
-        object.traverse( function ( child ) {
-            if ( child.isMesh ) child.material.uniforms.WaveRange.value=indexControl.waveRange;
-        } );
-    });
-
-    modelControllerFloder.addColor(indexControl, 'WaveColor').onChange(function(value){
-        indexControl.waveColor = value;
-        object.traverse( function ( child ) {
-            if ( child.isMesh ) child.material.uniforms.WaveColor.value=new THREE.Color(indexControl.waveColor);
-        } );
-    });
-
-    modelControllerFloder.add(indexControl, 'WaveSpeed', 0, 10).onChange(function(value){
-        indexControl.waveSpeed = value;
-        object.traverse( function ( child ) {
-            if ( child.isMesh ) child.material.uniforms.WaveSpeed.value=indexControl.waveSpeed;
-        } );
-    });
-
-    modelControllerFloder.add(indexControl, 'Opacity', 0, 1).onChange(function(value){
-        indexControl.opacity = value;
-        object.traverse( function ( child ) {
-            if ( child.isMesh ) child.material.uniforms.Opacity.value=indexControl.opacity;
-        } );
-    });
 
     // 场景控制
     const sceneControllerFloder = gui.addFolder('SceneController');
@@ -314,7 +224,12 @@ function setRenderPass(){
     
     // 初始化后期处理pass
     const bloomPass = new UnrealBloomPass( new THREE.Vector2( window.innerWidth, window.innerHeight ), 1.5, 0.4, 0.85 );
-    // composer.addPass( bloomPass );
+    bloomPass.renderToScreen = true;
+    bloomPass.threshold = 0;
+    bloomPass.strength = 0.5;
+    bloomPass.radius = 0;
+
+   // composer.addPass( bloomPass );
 }
 
 function initLight(){

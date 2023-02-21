@@ -80,7 +80,6 @@
 
             color += WaveColor * wave ;
         }
-
         
         gl_FragColor = vec4(BaseColor+color, Opacity);
     }
