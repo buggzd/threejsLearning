@@ -90,9 +90,10 @@ function modelUpdate(){
     if(modelsIsLoaded){
         upSpeed += indexControl.speed;
         object.position.y = indexControl.moveRange*Math.sin(upSpeed);
-        object.traverse( function ( child ) {
-            if ( child.isMesh ) child.material.uniforms.time.value = time.getElapsedTime();
-        } );
+        holographyMaterial.update();
+        // object.traverse( function ( child ) {
+        //     if ( child.isMesh ) child.material.uniforms.time.value = time.getElapsedTime();
+        // } );
     }
 }
 
@@ -115,9 +116,25 @@ function loadModel() {
 function loadModels(){
     const cube=new THREE.Mesh(
         new THREE.BoxGeometry(1,1,1),
-        new THREE.MeshPhongMaterial({color:0xff0000})
+        holographyMaterial.material
     );
+
+  
+
     cube.position.x = -3;
+    cube.position.y = 1;
+
+    const edges = new THREE.EdgesGeometry( cube.geometry );
+    const lineMaterial = new THREE.LineBasicMaterial( {
+        color: 0xffffff,
+        linewidth: 1,
+        dashed: false
+    } );
+    const cubeLine = new THREE.LineSegments( edges, lineMaterial );
+    cubeLine.position.x = -3;
+    cubeLine.position.y = 1;
+    scene.add( cubeLine );
+    
     scene.add(cube);
    // bunny
     objLoader.load(
@@ -223,13 +240,12 @@ function setRenderPass(){
     // TODO: 添加SelectiveBloomPass
     
     // 初始化后期处理pass
-    const bloomPass = new UnrealBloomPass( new THREE.Vector2( window.innerWidth, window.innerHeight ), 1.5, 0.4, 0.85 );
-    bloomPass.renderToScreen = true;
-    bloomPass.threshold = 0;
-    bloomPass.strength = 0.5;
-    bloomPass.radius = 0;
-
-   // composer.addPass( bloomPass );
+    // const bloomPass = new UnrealBloomPass( new THREE.Vector2( window.innerWidth, window.innerHeight ), 1.5, 0.4, 0.85 );
+    // bloomPass.renderToScreen = true;
+    // bloomPass.threshold = 0;
+    // bloomPass.strength = 0.5;
+    // bloomPass.radius = 0;
+    // composer.addPass( bloomPass );
 }
 
 function initLight(){
@@ -251,7 +267,6 @@ scene.add( ambientLight );
 dirLightColor = directionalLight.color;
  
 directionalLight.getWorldDirection(dirLightDirection);
-
 
 
 }
