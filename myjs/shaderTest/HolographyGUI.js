@@ -7,16 +7,16 @@ class HolographyGUI{
     constructor(HolographyMaterial){
         const shaderControl = new function() {
             // shader属性
-            this.color = 0xffffff;
+            this.color = 0x141f4d;
             this.enableFresnel = true;
-            this.fresnelPower = 2.0;
-            this.fresnelRange = 1;
-            this.fresnelColor = 0x0000ff;
+            this.fresnelPower = 5.38;
+            this.fresnelRange = 0.194;
+            this.fresnelColor = 0x00fffb;
         
             this.enableWave = true;
-            this.WavePower = 2.0;
-            this.WaveRange = 1;
-            this.WaveColor = 0x00ff00;
+            this.WavePower = 0.58;
+            this.WaveRange = 0.243;
+            this.WaveColor = 0x1affc6;
             this.WaveSpeed = 1.0;
         
             this.enableTransparent = true;

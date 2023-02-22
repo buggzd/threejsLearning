@@ -60,7 +60,6 @@
         
         // 菲涅尔描边效果
         if (enableFresnel) {
-            
             vec3 viewDir = normalize(cameraPosition - vWorldPosition);
             float fresnel = (1.0 - FresnelRange) + FresnelRange * dot(viewDir, vNormal);
             fresnel = 1.0 - pow(fresnel, FresnelPower);
@@ -71,13 +70,8 @@
         if (enableWave) {
             
             float noise=texture2D(noiseTexture,vec2(vWorldPosition.y,vWorldPosition.y)).r;
-            float wave = mod(vWorldPosition.y-time*WaveSpeed +noise , WaveRange);
-            
-            // 取小数
-            wave = wave - floor(wave);
-
-            wave = sin(wave * 3.1415926/2.0 )*WavePower;
-
+            float wave = mod(abs(vWorldPosition.y-time*WaveSpeed +noise) , WaveRange);
+            wave = saturate(wave);
             color += WaveColor * wave ;
         }
         

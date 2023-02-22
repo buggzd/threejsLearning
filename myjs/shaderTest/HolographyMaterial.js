@@ -51,9 +51,12 @@ class HolographyMaterial{
                 transparent: true
             });
     }
+    update() {
+        this.material.uniforms.time.value += 0.01;
+      }
+    destory(){
+        this.material.dispose();
+    }
 }
-
-
-
 
 export default HolographyMaterial ;
